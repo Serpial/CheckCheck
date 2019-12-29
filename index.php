@@ -49,6 +49,9 @@
             </div>
           </div>
         </div>
+
+        <h4 id="similar-locations-title"><span id="similar-locations-arrow">></span> Similar Locations</h4>
+        <div id="similar-locations-box">None</div>
       </main>
 
       <footer>
@@ -73,6 +76,7 @@
     var phonetic = ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GOLF', 'HOTEL', 'INDIA', 'JULIET', 'KILO', 'LIMA', 'MIKE', 'NOVEMBER', 'OSCAR', 'PAPA', 'QUEBEC', 'ROMEO', 'SIERRA', 'TANGO', 'UNIFORM', 'VICTOR', 'WHISKEY', 'X-RAY', 'YANKEE', 'ZULU'],
     numbers  = ['ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'],
     locationString = '';
+    var arrowRotated = false;
 
     function getPhonetic(l) {
       for (q=0;q<phonetic.length;q++) {
@@ -81,6 +85,13 @@
           break;
         }
       }
+    }
+
+    function fromPhonetic(l) {
+      var c = String.fromCharCode(
+        phonetic.findIndex(i => i==l)+65
+      );
+      return c;
     }
 
     function getLocationName(e) {
@@ -147,6 +158,49 @@
       return returnVal;
     }
 
+    function updateList(c) {
+      var outputHtml = "";
+
+      if (c != "@") {
+        console.log(c);
+        // Where i is the current check character, find others.
+        for (var i=1; i<100; i++) {
+          var isle = (i<10? "0"+i: i+"");
+          outputHtml += "<p class=\"isle\">";
+          outputHtml += "<div class=\"isle-name\">"+isle+" : </div>";
+          outputHtml += getBays(isle, c);
+          outputHtml += "</p>";
+        }
+        document.getElementById('similar-locations-box').innerHTML = outputHtml;
+      } else {
+        document.getElementById('similar-locations-box').innerText = 'None';
+      }
+    }
+
+    function getBays(isle, chkChar) {
+      var baysInIsle = "";
+
+      for (var j=65; j<91; j++) {
+        // Get Column
+        var col = String.fromCharCode(j);
+        for (var k=65; k<91; k++) {
+          // Get Row
+          var row = String.fromCharCode(k);
+          var location = isle+col+row;
+          var m = 0;
+
+          for (var l=2; l<6; l++) {
+            m+=(location.charCodeAt(l%4)) * (l%3*2+3);
+          }
+          if (String.fromCharCode(m%26+65) == chkChar) {
+            baysInIsle += location.substring(2,4)+", ";
+          }
+        }
+      }
+
+      return baysInIsle;
+    }
+
     document.getElementById('location-name').addEventListener('input', function(e) {
       var self = this,
           locationText = document.getElementById('location-text'),
@@ -162,10 +216,12 @@
           locationString += ((!!isNaN(c=location[k-2])) ? getPhonetic(c) : numbers[c]) + ' ';
         }
         
-        checkChar.innerText = getPhonetic(String.fromCharCode(i%26+65));
+        check = String.fromCharCode(i%26+65)
+        checkChar.innerText = getPhonetic(check);
         locationString = locationString.replace(/\s$/, '');
         locationText.innerText = getLocationName(locationString);
         locationString = '';
+        updateList(check);
       } else {
         locationText.innerText = checkChar.innerText = 'NULL';
       }
@@ -180,5 +236,18 @@
     document.getElementById('location-name').addEventListener('blur', function(e) {
       this.value === "" && (this.value = 'NULL');
     });
+
+    document.getElementById('similar-locations-title').onclick = function() {
+      document.getElementById('similar-locations-arrow').classList.toggle('rotated');
+      currentCheckChar = document.getElementById("check-char").innerText;
+      arrowRotated = !arrowRotated;
+
+      if (arrowRotated) {
+        updateList(fromPhonetic(currentCheckChar));
+        document.getElementById('similar-locations-box').style.display = 'block';
+      } else {
+        document.getElementById('similar-locations-box').style.display = 'none';
+      }
+    };
   </script>
 </html>
