@@ -82,21 +82,21 @@ main {
 	user-select: none;
 }
 
-#similar-locations-box {
+#similar-locations-box, .locations-box {
 	display: none;
 	font-size: small;
 }
 
-#similar-locations-arrow {
+.expand-arrow {
 	display: inline-block;
 	position: relative;
-	-webkit-transition: all 0.5s ease-in-out;
-    -moz-transition: all 0.5s ease-in-out;
-    -o-transition: all 0.5s ease-in-out;
-    transition: all 0.5s ease-in-out;
+	-webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    -o-transition: all 0.25s ease-in-out;
+    transition: all 0.25s ease-in-out;
 }
 
-#similar-locations-arrow.rotated {
+.expand-arrow.rotated {
 	color: red;
 	-webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
@@ -105,9 +105,17 @@ main {
     transform: rotate(90deg);
 }
 
+table, th, td {
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+
 .isle-name {
-	display: inline-block;
 	font-weight: bold;
+}
+
+.isle-locations {
+	padding: 0.5em 0;
 }
 
 footer {
