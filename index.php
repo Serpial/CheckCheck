@@ -50,8 +50,30 @@
           </div>
         </div>
 
-        <h4 id="similar-locations-title"><span id="similar-locations-arrow">></span> Similar Locations</h4>
-        <div id="similar-locations-box">None</div>
+        <h4 id="similar-locations-title"><span class="expand-arrow" id="similar-locations-arrow">></span> Similar Locations</h4>
+        <div id="similar-locations-box">
+          <h5>This is a list of locations with the same check digit as the location above</h5>
+          <div id="similar-locations-naughts"><span class="expand-arrow" id="sla-naughts">></span> 00s</div>
+          <div class="locations-box" id="naughts-box"></div>
+          <div id="similar-locations-tens"><span class="expand-arrow" id="sla-tens">></span> 10s</div>
+          <div class="locations-box" id="tens-box"></div>
+          <div id="similar-locations-twenties"><span class="expand-arrow" id="sla-twenties">></span> 20s</div>
+          <div class="locations-box" id="twenties-box"></div>
+          <div id="similar-locations-thirties"><span class="expand-arrow" id="sla-thirties">></span> 30s</div>
+          <div class="locations-box" id="thirties-box"></div>
+          <div id="similar-locations-forties"><span class="expand-arrow" id="sla-forties">></span> 40s</div>
+          <div class="locations-box" id="forties-box"></div>
+          <div id="similar-locations-fifties"><span class="expand-arrow" id="sla-fifties">></span> 50s</div>
+          <div class="locations-box" id="fifties-box"></div>
+          <div id="similar-locations-sixties"><span class="expand-arrow" id="sla-sixties">></span> 60s</div>
+          <div class="locations-box" id="sixties-box"></div>
+          <div id="similar-locations-seventies"><span class="expand-arrow" id="sla-seventies">></span> 70s</div>
+          <div class="locations-box" id="seventies-box"></div>
+          <div id="similar-locations-eighties"><span class="expand-arrow" id="sla-eighties">></span> 80s</div>
+          <div class="locations-box" id="eighties-box"></div>
+          <div id="similar-locations-nineties"><span class="expand-arrow" id="sla-nineties">></span> 90s</div>
+          <div class="locations-box" id="nineties-box"></div>
+        </div>
       </main>
 
       <footer>
@@ -73,10 +95,10 @@
   </body>
 
   <script>
-    var phonetic = ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GOLF', 'HOTEL', 'INDIA', 'JULIET', 'KILO', 'LIMA', 'MIKE', 'NOVEMBER', 'OSCAR', 'PAPA', 'QUEBEC', 'ROMEO', 'SIERRA', 'TANGO', 'UNIFORM', 'VICTOR', 'WHISKEY', 'X-RAY', 'YANKEE', 'ZULU'],
-    numbers  = ['ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'],
-    locationString = '';
-    var arrowRotated = false;
+    const phonetic = ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GOLF', 'HOTEL', 'INDIA', 'JULIET', 'KILO', 'LIMA', 'MIKE', 'NOVEMBER', 'OSCAR', 'PAPA', 'QUEBEC', 'ROMEO', 'SIERRA', 'TANGO', 'UNIFORM', 'VICTOR', 'WHISKEY', 'X-RAY', 'YANKEE', 'ZULU'];
+    const numbers  = ['ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'];
+    const numberIds = ["naughts","tens","twenties","thirties","forties","fifties","sixties","seventies","eighties","nineties"];
+    var locationString = '';
 
     function getPhonetic(l) {
       for (q=0;q<phonetic.length;q++) {
@@ -159,21 +181,25 @@
     }
 
     function updateList(c) {
-      var outputHtml = "";
-
       if (c != "@") {
-        console.log(c);
-        // Where i is the current check character, find others.
+        var locations=[""];
+        var isle;
+        document.getElementById('similar-locations-title').onclick = unfoldSimilarLocations;
+
         for (var i=1; i<100; i++) {
-          var isle = (i<10? "0"+i: i+"");
-          outputHtml += "<p class=\"isle\">";
-          outputHtml += "<div class=\"isle-name\">"+isle+" : </div>";
-          outputHtml += getBays(isle, c);
-          outputHtml += "</p>";
+          isle = (i<10? "0"+i: i+"");
+          
+          locations[Math.floor(i/10)] += '<div class="isle-locations"><span class="isle-name">'+isle+'</span>';
+          locations[Math.floor(i/10)] += ' : '+getBays(isle, c)+'</div>';
+
+          // Add an extra spot in the array
+          if (i % 9 == 0 && (i+1) < 100) { locations[Math.floor(i/10)+1] = ""; }
         }
-        document.getElementById('similar-locations-box').innerHTML = outputHtml;
+        for (var i=0; i<10; i++) {
+          document.getElementById(numberIds[i]+'-box').innerHTML = locations[i];
+        }
       } else {
-        document.getElementById('similar-locations-box').innerText = 'None';
+        document.getElementById('similar-locations-title').onclick = null;
       }
     }
 
@@ -200,6 +226,35 @@
 
       return baysInIsle;
     }
+    
+    function unfoldSimilarLocations() {
+      var dropdownCont = document.getElementById('similar-locations-box').style;
+      var currentCheckChar = document.getElementById("check-char").innerText;
+      var folded = dropdownCont.display == 'none' || dropdownCont.display == '';
+
+      if (currentCheckChar != "NULL") {
+        document.getElementById('similar-locations-arrow').classList.toggle('rotated');
+
+        if (folded) {
+          updateList(fromPhonetic(currentCheckChar));
+          dropdownCont.display = 'block';
+        } else {
+          dropdownCont.display = 'none';
+        }
+      }
+    }
+
+    function foldThis() {
+      var num = this.id.substring(this.id.indexOf('-')+2).substring(this.id.indexOf('-')+2);
+      var boxStyle = document.getElementById(num+'-box').style;
+      var folded = boxStyle.display == 'none' || boxStyle.display == '';
+      document.getElementById('sla-'+num).classList.toggle('rotated');
+      if (folded) {
+        boxStyle.display = 'block';
+      } else {
+        boxStyle.display = 'none';
+      }
+    }
 
     document.getElementById('location-name').addEventListener('input', function(e) {
       var self = this,
@@ -221,9 +276,16 @@
         locationString = locationString.replace(/\s$/, '');
         locationText.innerText = getLocationName(locationString);
         locationString = '';
+        document.getElementById('similar-locations-title').onclick = unfoldSimilarLocations;
         updateList(check);
       } else {
         locationText.innerText = checkChar.innerText = 'NULL';
+        if (document.getElementById('similar-locations-box').style.display != 'none' &&
+        document.getElementById('similar-locations-box').style.display != '') {
+          document.getElementById('similar-locations-title').onclick = null;
+          document.getElementById('similar-locations-arrow').classList.toggle('rotated');
+          document.getElementById('similar-locations-box').style.display = 'none';
+        }
       }
 
       e.preventDefault();
@@ -237,17 +299,9 @@
       this.value === "" && (this.value = 'NULL');
     });
 
-    document.getElementById('similar-locations-title').onclick = function() {
-      document.getElementById('similar-locations-arrow').classList.toggle('rotated');
-      currentCheckChar = document.getElementById("check-char").innerText;
-      arrowRotated = !arrowRotated;
+    for(var i=0; i<10; i++) {
+      document.getElementById('similar-locations-'+numberIds[i]).onclick = foldThis;
+    }
 
-      if (arrowRotated) {
-        updateList(fromPhonetic(currentCheckChar));
-        document.getElementById('similar-locations-box').style.display = 'block';
-      } else {
-        document.getElementById('similar-locations-box').style.display = 'none';
-      }
-    };
   </script>
 </html>
